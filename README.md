@@ -24,25 +24,31 @@ The final decision is **block**, despite a 10-percentage-point overall improveme
 
 ## Watch a real-model integration
 
-**[40-second SelectiveML + EvalDelta demo](https://github.com/brohum10/selective-ml#watch-the-40-second-walkthrough)**
+**[29-second Model Release Lab recording](https://github.com/brohum10/selective-ml#see-the-actual-app)**
 
-The companion SelectiveML project exports actual NumPy neural-network predictions
-on all 275 held-out public digit images. Its frozen seed-42 model has 7 errors on
-clean inputs and 27 after deterministic Gaussian input corruption. EvalDelta
-blocks that robustness comparison; an identical-run control passes, and a changed
-case hash is rejected as invalid. The noise is simulated, the model is unchanged,
-and these are small-dataset results—not production performance or an LLM evaluation.
+The companion SelectiveML project trains a linear baseline and a NumPy neural
+candidate on the same training rows, then compares their actual predictions on
+275 identical clean test inputs per seed. All three fixed seeds are reported:
+the candidate has higher overall accuracy in every run, but one run is blocked
+because its digit-5 check is inconclusive. That means the configured non-regression
+requirement was not established—not proof that the candidate is worse.
+Identical-run controls pass. These are retrospective small-dataset results,
+not production performance, a new blind benchmark, or an LLM evaluation.
 
 With both repositories in sibling folders, install SelectiveML's NumPy dependency,
 then run this from EvalDelta:
 
 ```sh
 python -m pip install -r ../selective-ml/requirements.txt
-python ../selective-ml/verify_gate.py --evaldelta evaldelta.py
+python ../selective-ml/release_lab.py --evaldelta evaldelta.py --output ../selective-ml/results/release-lab/new-run
 ```
 
-The verifier confirms the real CLI's **0 / 1 / 2** outcomes and emits fresh
-predictions, input hashes, and JSON gate reports. [Recorded evidence and scope](https://github.com/brohum10/selective-ml/tree/main/media).
+The runner calls the actual comparator CLI and writes exported models, every
+prediction, input hashes, controls, JSON gate reports and a manifest. It exits 0
+when analysis completes; add `--enforce` to return 1 if any planned seed blocks.
+Its checked-in protocol requires a checksum-verified comparator. The separate
+`verify_gate.py` integration exercises CLI **0 / 1 / 2** outcomes using the older
+noise-stress illustration. [Recorded evidence and scope](https://github.com/brohum10/selective-ml/tree/main/media).
 EvalDelta itself remains standard-library-only and does not run model inference.
 
 ## What it does
@@ -122,7 +128,7 @@ The 34 tests cover hidden subgroup regressions, inconclusive and underpowered co
 
 ## Important limitations
 
-- The built-in example is synthetic. The external SelectiveML walkthrough uses actual predictions with simulated input corruption; neither demonstrates production savings, serving performance, or live LLM quality.
+- The built-in example is synthetic. SelectiveML's Model Release Lab uses actual model-version predictions on clean inputs; its older walkthrough uses simulated corruption with unverified label preservation. Neither demonstrates production savings, serving performance, or live LLM quality.
 - Percentile bootstrap intervals are approximate and can be unreliable for small, skewed, or degenerate samples. Twenty cases is a configurable operational floor, not a power analysis.
 - Intervals are **unadjusted per slice**, not simultaneous confidence guarantees. Overlapping tags and repeated experiments complicate interpretation. This is a conservative workflow gate, not a formal family-wise statistical test.
 - Resampling assumes independent cases. Clustered conversations, repeated users, or multiple generations per prompt require an appropriate clustered/hierarchical method not implemented here.
