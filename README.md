@@ -22,6 +22,29 @@ The demo uses **100 hand-authored synthetic cases**, not responses from an actua
 
 The final decision is **block**, despite a 10-percentage-point overall improvement. These numbers illustrate the checker; they are not an AI accuracy benchmark. The demo runs in a temporary directory and leaves no dataset behind.
 
+## Watch a real-model integration
+
+**[40-second SelectiveML + EvalDelta demo](https://github.com/brohum10/selective-ml#watch-the-40-second-walkthrough)**
+
+The companion SelectiveML project exports actual NumPy neural-network predictions
+on all 275 held-out public digit images. Its frozen seed-42 model has 7 errors on
+clean inputs and 27 after deterministic Gaussian input corruption. EvalDelta
+blocks that robustness comparison; an identical-run control passes, and a changed
+case hash is rejected as invalid. The noise is simulated, the model is unchanged,
+and these are small-dataset results—not production performance or an LLM evaluation.
+
+With both repositories in sibling folders, install SelectiveML's NumPy dependency,
+then run this from EvalDelta:
+
+```sh
+python -m pip install -r ../selective-ml/requirements.txt
+python ../selective-ml/verify_gate.py --evaldelta evaldelta.py
+```
+
+The verifier confirms the real CLI's **0 / 1 / 2** outcomes and emits fresh
+predictions, input hashes, and JSON gate reports. [Recorded evidence and scope](https://github.com/brohum10/selective-ml/tree/main/media).
+EvalDelta itself remains standard-library-only and does not run model inference.
+
 ## What it does
 
 - Matches baseline and candidate by case ID, not row order.
@@ -99,7 +122,7 @@ The 34 tests cover hidden subgroup regressions, inconclusive and underpowered co
 
 ## Important limitations
 
-- The example is synthetic. No real model quality, production savings, or inference latency has been measured by this project.
+- The built-in example is synthetic. The external SelectiveML walkthrough uses actual predictions with simulated input corruption; neither demonstrates production savings, serving performance, or live LLM quality.
 - Percentile bootstrap intervals are approximate and can be unreliable for small, skewed, or degenerate samples. Twenty cases is a configurable operational floor, not a power analysis.
 - Intervals are **unadjusted per slice**, not simultaneous confidence guarantees. Overlapping tags and repeated experiments complicate interpretation. This is a conservative workflow gate, not a formal family-wise statistical test.
 - Resampling assumes independent cases. Clustered conversations, repeated users, or multiple generations per prompt require an appropriate clustered/hierarchical method not implemented here.
