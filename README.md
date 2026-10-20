@@ -24,7 +24,7 @@ The final decision is **block**, despite a 10-percentage-point overall improveme
 
 ## Watch a real-model integration
 
-**[29-second Model Release Lab recording](https://github.com/brohum10/selective-ml#see-the-actual-app)**
+**[36-second decision-workbench recording](https://github.com/brohum10/selective-ml#see-the-actual-app)**
 
 The companion SelectiveML project trains a linear baseline and a NumPy neural
 candidate on the same training rows, then compares their actual predictions on
@@ -34,6 +34,12 @@ because its digit-5 check is inconclusive. That means the configured non-regress
 requirement was not established—not proof that the candidate is worse.
 Identical-run controls pass. These are retrospective small-dataset results,
 not production performance, a new blind benchmark, or an LLM evaluation.
+
+The updated recording also shows a filterable error atlas, confusion/reliability
+diagnostics, review-threshold exploration, evidence exports and all seed outcomes.
+The sandbox never changes the frozen policy or gate; its test-set what-ifs are
+not fresh validation. These companion features remain outside EvalDelta's small
+standard-library comparator.
 
 With both repositories in sibling folders, install SelectiveML's NumPy dependency,
 then run this from EvalDelta:
